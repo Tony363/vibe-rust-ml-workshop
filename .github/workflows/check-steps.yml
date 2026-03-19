@@ -1,0 +1,49 @@
+name: Verify Workshop Steps
+
+on: [push, pull_request]
+
+jobs:
+  check-steps:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        step: [step-1-scaffold, step-2-data, step-3-training, step-4-complete]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.step }}
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ matrix.step }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-${{ matrix.step }}-
+            ${{ runner.os }}-cargo-
+      - run: cargo check
+      - run: cargo run --release
+
+  main-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-main-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-main-
+            ${{ runner.os }}-cargo-
+      - run: cargo clippy -- -D warnings
+      - run: cargo test
+      - run: cargo run --release
