@@ -7,6 +7,6 @@ edition = "2024"
 linfa = "0.7"
 linfa-trees = "0.7"
 linfa-datasets = { version = "0.7", features = ["iris"] }
-ndarray = "0.16"
+ndarray = "0.15"
 comfy-table = "7"
 rand = "0.8"

@@ -1,11 +1,15 @@
-use comfy_table::{Table, presets::UTF8_FULL};
+use comfy_table::{presets::UTF8_FULL, Table};
 use linfa::prelude::*;
 use linfa_trees::DecisionTree;
 use linfa_trees::SplitQuality;
+use ndarray::Axis;
+use rand::thread_rng;
 use std::time::Instant;
 
+const CLASS_NAMES: [&str; 3] = ["Setosa", "Versicolor", "Virginica"];
+
 fn main() {
-    println!("\n  Vibe Rust ML Workshop — Iris Classification\n");
+    println!("\n  Vibe Rust ML Workshop -- Iris Classification\n");
 
     // Load the Iris dataset (150 samples, 4 features, 3 classes)
     let dataset = linfa_datasets::iris();
@@ -22,12 +26,13 @@ fn main() {
     info_table.add_row(vec!["Samples", &n_samples.to_string()]);
     info_table.add_row(vec!["Features", &n_features.to_string()]);
     info_table.add_row(vec!["Classes", "3 (Setosa, Versicolor, Virginica)"]);
-    info_table.add_row(vec!["Features", &feature_names.join(", ")]);
+    info_table.add_row(vec!["Feature Names", &feature_names.join(", ")]);
     println!("{info_table}\n");
 
-    // Split into training (80%) and testing (20%) sets
+    // Shuffle and split into training (80%) and testing (20%) sets
+    let mut rng = thread_rng();
+    let dataset = dataset.shuffle(&mut rng);
     let (train, test) = dataset.split_with_ratio(0.8);
-
     println!(
         "  Train/Test split: {} training, {} testing samples\n",
         train.nsamples(),
@@ -55,6 +60,108 @@ fn main() {
     let t2_elapsed = t2.elapsed();
     println!("  -> Trained in {:.2?}\n", t2_elapsed);
 
-    // Suppress unused-variable warnings (used in next step)
-    let _ = (&gini_tree, &entropy_tree, &test, &t1_elapsed, &t2_elapsed);
+    // ==================== EVALUATION ====================
+
+    // Predict with both models
+    let gini_pred = gini_tree.predict(&test);
+    let entropy_pred = entropy_tree.predict(&test);
+
+    // Confusion matrices via linfa
+    let gini_cm = gini_pred.confusion_matrix(&test).expect("confusion matrix");
+    let entropy_cm = entropy_pred.confusion_matrix(&test).expect("confusion matrix");
+
+    let gini_acc = gini_cm.accuracy();
+    let entropy_acc = entropy_cm.accuracy();
+
+    // --- Model Comparison Table ---
+    let mut cmp_table = Table::new();
+    cmp_table.load_preset(UTF8_FULL);
+    cmp_table.set_header(vec![
+        "Model",
+        "Split Quality",
+        "Max Depth",
+        "Accuracy",
+        "Train Time",
+    ]);
+    cmp_table.add_row(vec![
+        "Tree 1".to_string(),
+        "Gini".to_string(),
+        "4".to_string(),
+        format!("{:.1}%", gini_acc * 100.0),
+        format!("{:.2?}", t1_elapsed),
+    ]);
+    cmp_table.add_row(vec![
+        "Tree 2".to_string(),
+        "Entropy".to_string(),
+        "None".to_string(),
+        format!("{:.1}%", entropy_acc * 100.0),
+        format!("{:.2?}", t2_elapsed),
+    ]);
+    println!("  Model Comparison");
+    println!("{cmp_table}\n");
+
+    // --- Confusion Matrix (Gini model) ---
+    // predict() returns Array1<usize> directly
+    let gini_preds: Vec<usize> = gini_pred.iter().copied().collect();
+    let actuals: Vec<usize> = test.as_targets().iter().copied().collect();
+    println!("  Confusion Matrix (Tree 1 -- Gini)");
+    print_confusion_matrix(&actuals, &gini_preds);
+
+    // --- Sample Predictions Table (first 10) ---
+    println!("\n  Sample Predictions (first 10 test samples)");
+    let mut pred_table = Table::new();
+    pred_table.load_preset(UTF8_FULL);
+    pred_table.set_header(vec![
+        "#", "Sepal L", "Sepal W", "Petal L", "Petal W", "Actual", "Predicted",
+    ]);
+
+    let records = test.records();
+    let n_show = 10.min(test.nsamples());
+
+    for i in 0..n_show {
+        let row = records.index_axis(Axis(0), i);
+        let actual = actuals[i];
+        let predicted = gini_preds[i];
+        let marker = if actual == predicted { "" } else { " [X]" };
+        pred_table.add_row(vec![
+            format!("{}", i + 1),
+            format!("{:.1}", row[0]),
+            format!("{:.1}", row[1]),
+            format!("{:.1}", row[2]),
+            format!("{:.1}", row[3]),
+            CLASS_NAMES[actual].to_string(),
+            format!("{}{}", CLASS_NAMES[predicted], marker),
+        ]);
+    }
+    println!("{pred_table}\n");
+}
+
+fn print_confusion_matrix(actuals: &[usize], predictions: &[usize]) {
+    let n_classes = CLASS_NAMES.len();
+    let mut matrix = vec![vec![0usize; n_classes]; n_classes];
+
+    for (&actual, &predicted) in actuals.iter().zip(predictions.iter()) {
+        if actual < n_classes && predicted < n_classes {
+            matrix[actual][predicted] += 1;
+        }
+    }
+
+    let mut table = Table::new();
+    table.load_preset(UTF8_FULL);
+
+    let mut header: Vec<String> = vec!["Actual \\ Predicted".to_string()];
+    for name in &CLASS_NAMES {
+        header.push(name.to_string());
+    }
+    table.set_header(header);
+
+    for (i, row) in matrix.iter().enumerate() {
+        let mut table_row = vec![CLASS_NAMES[i].to_string()];
+        for val in row {
+            table_row.push(val.to_string());
+        }
+        table.add_row(table_row);
+    }
+
+    println!("{table}");
 }

@@ -195,7 +195,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56f9097edc7c89d03d526efbacf6d90914e3a8fa53bd56c2d1489e3a90819370"
 dependencies = [
  "approx",
- "ndarray 0.15.6",
+ "ndarray",
  "num-traits",
  "rand",
  "sprs",
@@ -211,7 +211,7 @@ dependencies = [
  "csv",
  "flate2",
  "linfa",
- "ndarray 0.15.6",
+ "ndarray",
  "ndarray-csv",
 ]
 
@@ -222,7 +222,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4a6fb1175e686aced100683f9a8149c9bdf3b387fc0d9e01f7cc0a48d5ee2ff8"
 dependencies = [
  "linfa",
- "ndarray 0.15.6",
+ "ndarray",
  "ndarray-rand",
 ]
 
@@ -289,21 +289,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ndarray"
-version = "0.16.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "882ed72dce9365842bf196bdeedf5055305f11fc8c03dee7bb0194a6cad34841"
-dependencies = [
- "matrixmultiply",
- "num-complex",
- "num-integer",
- "num-traits",
- "portable-atomic",
- "portable-atomic-util",
- "rawpointer",
-]
-
-[[package]]
 name = "ndarray-csv"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -311,7 +296,7 @@ checksum = "9f7c71981ebc5a541b64a8af9db36502669932550d23c0e5e8e5a873d11902b4"
 dependencies = [
  "csv",
  "either",
- "ndarray 0.15.6",
+ "ndarray",
  "serde",
 ]
 
@@ -321,7 +306,7 @@ version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "65608f937acc725f5b164dcf40f4f0bc5d67dc268ab8a649d3002606718c4588"
 dependencies = [
- "ndarray 0.15.6",
+ "ndarray",
  "rand",
  "rand_distr",
 ]
@@ -375,21 +360,6 @@ dependencies = [
  "redox_syscall",
  "smallvec",
  "windows-link",
-]
-
-[[package]]
-name = "portable-atomic"
-version = "1.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c33a9471896f1c69cecef8d20cbe2f7accd12527ce60845ff44c153bb2a21b49"
-
-[[package]]
-name = "portable-atomic-util"
-version = "0.2.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "091397be61a01d4be58e7841595bd4bfedb15f1cd54977d79b8271e94ed799a3"
-dependencies = [
- "portable-atomic",
 ]
 
 [[package]]
@@ -566,7 +536,7 @@ version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "88bab60b0a18fb9b3e0c26e92796b3c3a278bf5fa4880f5ad5cc3bdfb843d0b1"
 dependencies = [
- "ndarray 0.15.6",
+ "ndarray",
  "num-complex",
  "num-traits",
  "smallvec",
@@ -629,7 +599,7 @@ dependencies = [
  "linfa",
  "linfa-datasets",
  "linfa-trees",
- "ndarray 0.16.1",
+ "ndarray",
  "rand",
 ]
 
