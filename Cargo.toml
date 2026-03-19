@@ -1,0 +1,12 @@
+[package]
+name = "vibe-rust-ml-workshop"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+linfa = "0.7"
+linfa-trees = "0.7"
+linfa-datasets = { version = "0.7", features = ["iris"] }
+ndarray = "0.16"
+comfy-table = "7"
+rand = "0.8"
