@@ -1,0 +1,118 @@
+name: Update Leaderboard
+
+on:
+  pull_request:
+    branches: [submissions]
+    types: [closed]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  update:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: submissions
+
+      - name: Collect scores and update LEADERBOARD.md
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const MARKER = '<!-- ml-leaderboard -->';
+            const scores = [];
+
+            // Paginate through all merged PRs targeting submissions
+            let page = 1;
+            while (true) {
+              const { data: prs } = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'closed',
+                base: 'submissions',
+                per_page: 100,
+                page,
+              });
+              if (prs.length === 0) break;
+
+              for (const pr of prs) {
+                if (!pr.merged_at) continue;
+
+                const { data: comments } = await github.rest.issues.listComments({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  per_page: 100,
+                });
+
+                for (const comment of comments) {
+                  if (comment.body && comment.body.includes(MARKER)) {
+                    const match = comment.body.match(/<!-- score:({.*?}) -->/);
+                    if (match) {
+                      try {
+                        const s = JSON.parse(match[1]);
+                        scores.push({
+                          pr: pr.number,
+                          author: pr.user.login,
+                          ...s,
+                        });
+                      } catch {}
+                    }
+                    break;
+                  }
+                }
+              }
+              page++;
+            }
+
+            // Sort by accuracy descending
+            scores.sort((a, b) => b.accuracy - a.accuracy);
+
+            // Build ranked rows
+            const medals = ['\u{1F947}', '\u{1F948}', '\u{1F949}'];
+            let rows = '';
+            for (let i = 0; i < scores.length; i++) {
+              const s = scores[i];
+              const rank = i < 3 ? medals[i] : `${i + 1}`;
+              rows += `| ${rank} | @${s.author} | ${(s.accuracy * 100).toFixed(1)}% | ${s.model_name} | #${s.pr} |\n`;
+            }
+
+            const content = `# Leaderboard
+
+            Scores from the workshop challenge. CI scores every PR using a deterministic scorer (\`src/bin/score.rs\`) with fixed RNG seed (1) for fair comparison.
+
+            *Updated automatically when submissions are merged.*
+
+            | Rank | Participant | Accuracy | Model | PR |
+            |------|-------------|----------|-------|----|
+            ${rows}| -    | Baseline    | 93.3%    | DecisionTree (Entropy, depth=10) | - |
+
+            ## How to Submit
+
+            1. Create a branch from \`submissions\`
+            2. Edit \`src/lib.rs\` -- change \`build_and_predict()\` and \`model_name()\` to try different algorithms
+            3. Run \`cargo run --bin score --release\` locally to check your deterministic score
+            4. Push your branch and open a PR targeting the \`submissions\` branch
+            5. CI will automatically score your code and post a leaderboard comment on the PR
+
+            ## Rules
+
+            - Only modify \`src/lib.rs\` and \`Cargo.toml\` (to add dependencies)
+            - Must use linfa algorithms
+            - The scorer uses its own seeded RNG and train/test split -- you cannot influence it
+            - \`build_and_predict()\` receives training data and test features, returns predictions
+            - Highest accuracy wins
+            `.replace(/^            /gm, '');
+
+            fs.writeFileSync('LEADERBOARD.md', content);
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add LEADERBOARD.md
+          git diff --staged --quiet || (git commit -m "Update leaderboard [skip ci]" && git push)
