@@ -3,7 +3,7 @@ use rand::rngs::StdRng;
 use rand::SeedableRng;
 
 const SEED: u64 = 1;
-const SPLIT_RATIO: f32 = 0.8;
+const SPLIT_RATIO: f32 = 0.6;
 
 fn main() {
     let dataset = linfa_datasets::iris();

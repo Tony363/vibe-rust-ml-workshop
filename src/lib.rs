@@ -3,16 +3,14 @@ use linfa::DatasetBase;
 use linfa_trees::{DecisionTree, SplitQuality};
 use ndarray::{Array1, Array2};
 
-/// Participants: modify this function to build your best model!
-/// You can use any linfa algorithm (trees, SVM, KNN, clustering, etc.)
-/// but must return predictions as Array1<usize> for the 3 Iris classes.
+/// Entropy-based decision tree with shallow depth for better generalization.
 pub fn build_and_predict(
     train: &DatasetBase<Array2<f64>, Array1<usize>>,
     test_features: &Array2<f64>,
 ) -> Array1<usize> {
     let model = DecisionTree::params()
-        .split_quality(SplitQuality::Gini)
-        .max_depth(Some(4))
+        .split_quality(SplitQuality::Entropy)
+        .max_depth(Some(3))
         .fit(train)
         .expect("training failed");
     model.predict(test_features)
@@ -20,5 +18,5 @@ pub fn build_and_predict(
 
 /// Name your model (shown on the leaderboard)
 pub fn model_name() -> &'static str {
-    "DecisionTree (Gini, depth=4)"
+    "DecisionTree (Entropy, depth=3)"
 }

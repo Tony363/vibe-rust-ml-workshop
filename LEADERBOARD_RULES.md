@@ -35,20 +35,32 @@ Only modify these two functions in `src/lib.rs`:
 ## Scoring
 
 - Fixed random seed: `1`
-- Train/test split: 80/20
+- Train/test split: 60/40
 - Metric: accuracy = correct predictions / total test samples
 - Deterministic -- same code always gets the same score
+
+## Strategies to Try
+
+- **Swap the algorithm** -- KNN, SVM, logistic regression, or any linfa learner
+- **Tune hyperparameters** -- depth, k value, regularization strength, kernel type
+- **Feature engineering** -- normalize features, create polynomial combinations, drop weak columns (all via `ndarray` ops inside `build_and_predict`)
+- **Ensemble** -- train multiple models and majority-vote the predictions
+- **Mix and match** -- combine strategies (e.g., normalize + SVM + tuned hyperparams)
 
 ## Quick-Start Vibe Prompts
 
 Try giving these prompts to your AI coding assistant:
 
-> "Change the model in src/lib.rs to use KNN with k=5 instead of a decision tree. Use linfa-nn."
+> "Change the model in src/lib.rs to use KNN with k=5 instead of a decision tree. Add linfa-nn to Cargo.toml."
 
 > "Switch to a random forest approach -- train multiple decision trees with different depths and take a majority vote."
 
 > "Use linfa-logistic to train a multinomial logistic regression model instead of a decision tree."
 
 > "Try linfa-svm with an RBF kernel for the Iris classifier."
+
+> "Normalize the features to zero mean and unit variance before training, then try SVM."
+
+> "Build an ensemble: train 3 different models (decision tree, KNN, logistic regression) and return the majority vote prediction."
 
 > "Increase max_depth to 10 and switch from Gini to Entropy."
