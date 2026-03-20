@@ -11,6 +11,20 @@ Both challenges are scored on every PR. Edit the corresponding functions in `src
 
 ## How to Submit
 
+```mermaid
+flowchart LR
+    A["🔀 Branch from\nsubmissions"] --> B["✏️ Edit\nsrc/lib.rs"]
+    B --> C["🧪 Test Locally\ncargo run --bin score"]
+    C --> D["📤 Push &\nOpen PR"]
+    D --> E["🤖 CI Scores\nBoth Challenges"]
+    E --> F["🏆 Leaderboard\nPosted on PR"]
+    style A fill:#e3f2fd
+    style B fill:#fff3e0
+    style C fill:#e8f5e9
+    style E fill:#f3e5f5
+    style F fill:#fce4ec
+```
+
 1. Create a branch from `submissions`
 2. Edit `src/lib.rs` -- modify the functions for one or both challenges
 3. Run `cargo run --bin score --release` (Iris) and/or `cargo run --bin score_wine --release` (Wine) locally
@@ -45,12 +59,41 @@ Only modify these functions in `src/lib.rs`:
 
 ## Scoring
 
+```mermaid
+flowchart LR
+    D["Full Dataset"] -->|"seed=1 shuffle"| S["✂️ 80/20 Split"]
+    S --> TR["Train Set\n80%"]
+    S --> TE["Test Set\n20%"]
+    TR -->|"your model"| M["Trained Model"]
+    M -->|"predict"| P["Predictions"]
+    TE --> V["Compare"]
+    P --> V
+    V --> A["✅ Accuracy\ncorrect / total"]
+    style A fill:#e8f5e9
+```
+
 - Fixed random seed: `1`
 - Train/test split: 80/20
 - Metric: accuracy = correct predictions / total test samples
 - Deterministic -- same code always gets the same score
 
 ## What You Get on Your PR
+
+```mermaid
+flowchart TD
+    PR["Your PR"] --> CI["CI Runner"]
+    CI --> S1["🌸 Iris Scorer\nseed=1, 80/20 split"]
+    CI --> S2["🍷 Wine Scorer\nseed=1, 80/20 split"]
+    S1 --> R["📊 Combined Report"]
+    S2 --> R
+    R --> C1["Accuracy Charts"]
+    R --> C2["Ranked Leaderboard"]
+    R --> C3["Confusion Matrices"]
+    R --> C4["Per-Class Metrics"]
+    style PR fill:#e3f2fd
+    style CI fill:#f3e5f5
+    style R fill:#e8f5e9
+```
 
 CI posts a detailed performance report as a comment on your PR:
 
