@@ -4,6 +4,22 @@
 
 Target audience: AI/vibe coding enthusiasts. Do NOT assume Rust expertise. Keep language accessible and jargon-free. When Rust-specific concepts come up, explain them in plain terms.
 
+```mermaid
+gantt
+    title Workshop Timeline (45 min)
+    dateFormat mm
+    axisFormat %M min
+    section Presentation
+        Hook + Context           :a1, 00, 8m
+    section Live Coding
+        Scaffold + Data + Train  :a2, after a1, 14m
+        Evaluation + Output      :a3, after a2, 11m
+    section Interactive
+        Audience Challenge       :a4, after a3, 7m
+    section Wrap-up
+        Q&A                      :a5, after a4, 5m
+```
+
 ---
 
 ### 0:00-0:08 -- Hook + Context
@@ -39,6 +55,17 @@ Use the show of hands to calibrate. If most people are Python users, lean into c
   - We will load data, train a decision tree, evaluate it, and produce beautiful terminal output.
   - All in about 170 lines of Rust, written with AI assistance.
 
+```mermaid
+flowchart LR
+    A["🗣️ You describe\nintent"] --> B["🤖 AI writes\nRust code"]
+    B --> C["🔨 Compiler\nverifies correctness"]
+    C --> D["✅ Working\nML pipeline"]
+    style A fill:#e3f2fd
+    style B fill:#fff3e0
+    style C fill:#fce4ec
+    style D fill:#e8f5e9
+```
+
 **Transition:** "Let's stop talking about it and start building. I'm going to open my terminal and we will scaffold this project together."
 
 ---
@@ -46,6 +73,14 @@ Use the show of hands to calibrate. If most people are Python users, lean into c
 ### 0:08-0:22 -- Live Build: Scaffold to Data to Training (Acts 1-2)
 
 **Act 1: Scaffold the project (about 3 minutes)**
+
+```mermaid
+flowchart TD
+    A["cargo new vibe-rust-ml-workshop"] --> B["Add deps to Cargo.toml"]
+    B --> C["cargo build\n⏳ dependencies download"]
+    C --> D["✅ step-1-scaffold"]
+    style D fill:#e8f5e9
+```
 
 - Run `cargo new vibe-rust-ml-workshop` and show what gets generated.
 - Explain briefly: `Cargo.toml` is like `package.json` or `requirements.txt` -- it declares your dependencies. `src/main.rs` is your entry point.
@@ -60,6 +95,16 @@ Use the show of hands to calibrate. If most people are Python users, lean into c
 **Git tag: step-1-scaffold**
 
 **Act 2: Load data and train the model (about 11 minutes)**
+
+```mermaid
+flowchart TD
+    A["linfa_datasets::iris()\n150 samples × 4 features"] --> B["Shuffle + Split\n80% train / 20% test"]
+    B --> C["DecisionTree::params()\n.entropy().depth(10).fit()"]
+    C --> D["✅ Model trained"]
+    style A fill:#e3f2fd
+    style C fill:#fff3e0
+    style D fill:#e8f5e9
+```
 
 - Load the Iris dataset using `linfa_datasets::iris()`.
 - Show how the compiler catches errors immediately if you use the wrong type or forget an import.
@@ -170,6 +215,29 @@ Say to the audience: "We have a working ML pipeline. Now let's do some real vibe
   - Optimize hot paths in Rust (data preprocessing, feature engineering, serving).
   - This is not an either/or choice. Use both.
 
+```mermaid
+flowchart LR
+    subgraph "🐍 Python"
+        P1["Experiment"]
+        P2["Train Models"]
+        P3["Notebooks"]
+    end
+    subgraph "🦀 Rust"
+        R1["Data Pipelines"]
+        R2["Feature Engineering"]
+        R3["Serving Layer"]
+        R4["Monitoring"]
+    end
+    P2 --> R3
+    style P1 fill:#e3f2fd
+    style P2 fill:#e3f2fd
+    style P3 fill:#e3f2fd
+    style R1 fill:#fff3e0
+    style R2 fill:#fff3e0
+    style R3 fill:#fff3e0
+    style R4 fill:#fff3e0
+```
+
 - **"Systems around models" -- the real opportunity:**
   - Most production ML is not the model itself. It is the data pipeline, the feature store, the serving layer, the monitoring.
   - Rust excels at these "systems around models" -- high-performance data ingestion, reliable serving with predictable latency, safe concurrent processing.
@@ -196,6 +264,19 @@ Say to the audience: "We have a working ML pipeline. Now let's do some real vibe
 
 If you fall behind or something breaks during the live demo, use these checkpoints to jump to any stage of the project. Each tag represents a working state.
 
+```mermaid
+flowchart LR
+    X["💥 Something broke!"] --> S["git stash"]
+    S --> T1["step-1-scaffold\n🏗️"]
+    S --> T2["step-2-data\n📦"]
+    S --> T3["step-3-training\n🧠"]
+    S --> T4["step-4-complete\n📊"]
+    S --> M["master\n🏠"]
+    style X fill:#ffcdd2
+    style T4 fill:#c8e6c9
+    style M fill:#c8e6c9
+```
+
 ```
 git stash                        # save any in-progress work
 git checkout step-1-scaffold     # jump to scaffold
@@ -220,6 +301,25 @@ git checkout master              # return to main
 ---
 
 ### Key Messages to Reinforce Throughout
+
+```mermaid
+mindmap
+  root(("Key\nMessages"))
+    ("🔨 Rust Compiler\n= Safety Net")
+      Catches bugs at compile time
+      Null pointers, data races, type errors
+    ("🤖 Vibe Coding\n+ Rust")
+      AI handles syntax
+      Compiler handles correctness
+      You handle intent
+    ("🐍+🦀 Hybrid\nPattern")
+      Python for experimentation
+      Rust for production
+    ("⚙️ Systems\nAround Models")
+      Data pipelines
+      Serving layers
+      Not the neural net itself
+```
 
 1. **The Rust compiler is your AI safety net.** It catches entire classes of bugs at compile time -- null pointer dereferences, data races, use-after-free, type mismatches. These are bugs that would be silent runtime errors in other languages.
 

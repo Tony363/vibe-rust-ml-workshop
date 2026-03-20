@@ -2,6 +2,13 @@
 
 CI scores every PR using deterministic scorers with fixed RNG seed (1) for fair comparison.
 
+```mermaid
+xychart-beta horizontal
+    title "Baselines to Beat"
+    x-axis ["🌸 Iris (93.3%)", "🍷 Wine Quality (53.9%)"]
+    bar [93.3, 53.9]
+```
+
 ## Iris (Easy)
 
 | Rank | Participant | Accuracy | Model | PR |

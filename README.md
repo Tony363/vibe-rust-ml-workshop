@@ -4,6 +4,17 @@ A workshop demo project that builds an Iris flower classifier in Rust using [Lin
 
 ## What It Does
 
+```mermaid
+flowchart LR
+    A["📦 Load Dataset"] --> B["✂️ Train/Test Split"]
+    B --> C["🧠 Train Models"]
+    C --> D["📊 Evaluate"]
+    D --> E["🖥️ Terminal Output"]
+    style A fill:#e1f5fe
+    style C fill:#fff3e0
+    style D fill:#e8f5e9
+```
+
 - Loads the classic Iris dataset (150 samples, 4 features, 3 classes)
 - Trains two Decision Tree classifiers (participant model from lib.rs + built-in Entropy tree)
 - Evaluates both models and displays results in formatted terminal tables
@@ -24,6 +35,19 @@ cargo run --release
 ## Workshop Steps
 
 The project is built incrementally. Each Git tag represents a compilable, runnable checkpoint:
+
+```mermaid
+flowchart LR
+    S1["step-1-scaffold\n🏗️ Project Setup"]
+    S2["step-2-data\n📦 Data Loading"]
+    S3["step-3-training\n🧠 Model Training"]
+    S4["step-4-complete\n📊 Evaluation"]
+    S1 --> S2 --> S3 --> S4
+    style S1 fill:#e3f2fd
+    style S2 fill:#e8f5e9
+    style S3 fill:#fff3e0
+    style S4 fill:#fce4ec
+```
 
 ### Step 1: Scaffold (`step-1-scaffold`)
 
@@ -133,19 +157,31 @@ Note: the demo uses seed 42; the CI scorer (`src/bin/score.rs`) uses seed 1 for 
 
 ## Project Structure
 
-```
-vibe-rust-ml-workshop/
-  Cargo.toml            # Dependencies: linfa, linfa-trees, linfa-datasets, ndarray, comfy-table, rand
-  src/main.rs           # Complete pipeline (~170 lines)
-  src/lib.rs            # Participant-editable models (Iris + Wine Quality)
-  src/bin/score.rs      # Iris scorer for CI leaderboard
-  src/bin/score_wine.rs # Wine Quality scorer for CI leaderboard (hard mode)
-  WORKSHOP.md           # Speaker notes (45-min session breakdown)
-  README.md             # This file
-  LEADERBOARD.md        # Current standings
-  LEADERBOARD_RULES.md  # Submission rules and allowed crates
-  Vibe-Coding-a-Rust-ML-Pipeline.pptx  # Workshop slide deck
-  .github/workflows/    # CI: checkpoint tests + leaderboard scoring
+```mermaid
+graph LR
+    subgraph "Source Code"
+        lib["src/lib.rs\n✏️ Participant Models"]
+        main["src/main.rs\nDemo Binary"]
+        score["src/bin/score.rs\n🌸 Iris Scorer"]
+        wine["src/bin/score_wine.rs\n🍷 Wine Scorer"]
+    end
+    subgraph "CI / Leaderboard"
+        lb["leaderboard.yml\nScore PRs"]
+        ulb["update-leaderboard.yml\nUpdate Rankings"]
+        cs["check-steps.yml\nVerify Tags"]
+    end
+    subgraph "Docs"
+        ws["WORKSHOP.md"]
+        rules["LEADERBOARD_RULES.md"]
+        lead["LEADERBOARD.md"]
+    end
+    lib --> main
+    lib --> score
+    lib --> wine
+    score --> lb
+    wine --> lb
+    lb --> lead
+    ulb --> lead
 ```
 
 ## Dependencies
@@ -162,6 +198,13 @@ vibe-rust-ml-workshop/
 ## Workshop Challenge
 
 Think you can beat the baseline? Two challenges, pick one or both!
+
+```mermaid
+xychart-beta horizontal
+    title "Baseline Accuracy — Can You Beat It?"
+    x-axis ["🌸 Iris (Easy)", "🍷 Wine Quality (Hard)"]
+    bar [93.3, 53.9]
+```
 
 | Challenge | Dataset | Baseline | Beat this! |
 |-----------|---------|----------|------------|
