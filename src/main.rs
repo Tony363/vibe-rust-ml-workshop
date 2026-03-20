@@ -43,10 +43,10 @@ fn main() {
         test.nsamples()
     );
 
-    // --- Model 1: Decision Tree (Gini, max_depth=4) via lib.rs ---
+    // --- Participant model via lib.rs ---
     println!("  Training Model 1: {}...", model_name());
     let t1 = Instant::now();
-    let gini_pred = build_and_predict(&train, test.records());
+    let lib_pred = build_and_predict(&train, test.records());
     let t1_elapsed = t1.elapsed();
     println!("  -> Trained in {:.2?}", t1_elapsed);
 
@@ -69,11 +69,11 @@ fn main() {
     let entropy_cm = entropy_pred.confusion_matrix(&test).expect("confusion matrix");
     let entropy_acc = entropy_cm.accuracy();
 
-    // Compute gini accuracy manually (gini_pred is Array1<usize> from lib.rs)
+    // Compute lib model accuracy manually (lib_pred is Array1<usize> from lib.rs)
     let actuals: Vec<usize> = test.as_targets().iter().copied().collect();
-    let gini_preds: Vec<usize> = gini_pred.iter().copied().collect();
-    let gini_correct = gini_preds.iter().zip(actuals.iter()).filter(|(p, a)| p == a).count();
-    let gini_acc = gini_correct as f64 / actuals.len() as f64;
+    let lib_preds: Vec<usize> = lib_pred.iter().copied().collect();
+    let lib_correct = lib_preds.iter().zip(actuals.iter()).filter(|(p, a)| p == a).count();
+    let lib_acc = lib_correct as f64 / actuals.len() as f64;
 
     // --- Model Comparison Table ---
     let mut cmp_table = Table::new();
@@ -86,10 +86,10 @@ fn main() {
         "Train Time",
     ]);
     cmp_table.add_row(vec![
-        "Tree 1".to_string(),
-        "Gini".to_string(),
-        "4".to_string(),
-        format!("{:.1}%", gini_acc * 100.0),
+        model_name().to_string(),
+        "-".to_string(),
+        "-".to_string(),
+        format!("{:.1}%", lib_acc * 100.0),
         format!("{:.2?}", t1_elapsed),
     ]);
     cmp_table.add_row(vec![
@@ -102,9 +102,9 @@ fn main() {
     println!("  Model Comparison");
     println!("{cmp_table}\n");
 
-    // --- Confusion Matrix (Gini model) ---
-    println!("  Confusion Matrix (Tree 1 -- Gini)");
-    print_confusion_matrix(&actuals, &gini_preds);
+    // --- Confusion Matrix (lib model) ---
+    println!("  Confusion Matrix ({})", model_name());
+    print_confusion_matrix(&actuals, &lib_preds);
 
     // --- Sample Predictions Table (first 10) ---
     println!("\n  Sample Predictions (first 10 test samples)");
@@ -120,7 +120,7 @@ fn main() {
     for i in 0..n_show {
         let row = records.index_axis(Axis(0), i);
         let actual = actuals[i];
-        let predicted = gini_preds[i];
+        let predicted = lib_preds[i];
         let marker = if actual == predicted { "" } else { " [X]" };
         pred_table.add_row(vec![
             format!("{}", i + 1),
@@ -135,8 +135,8 @@ fn main() {
     println!("{pred_table}\n");
 
     // Machine-readable score line for CI leaderboard
-    let best_acc = gini_acc.max(entropy_acc.into());
-    println!("LEADERBOARD_SCORE best={:.4} gini={:.4} entropy={:.4}", best_acc, gini_acc, entropy_acc);
+    let best_acc = lib_acc.max(entropy_acc.into());
+    println!("LEADERBOARD_SCORE best={:.4} lib={:.4} entropy={:.4}", best_acc, lib_acc, entropy_acc);
 }
 
 fn print_confusion_matrix(actuals: &[usize], predictions: &[usize]) {

@@ -51,4 +51,4 @@ Try giving these prompts to your AI coding assistant:
 
 > "Try linfa-svm with an RBF kernel for the Iris classifier."
 
-> "Increase max_depth to 10 and switch from Gini to Entropy."
+> "Reduce max_depth to 3 and switch from Entropy to Gini to see how accuracy changes."

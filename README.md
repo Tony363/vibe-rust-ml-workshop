@@ -5,7 +5,7 @@ A workshop demo project that builds an Iris flower classifier in Rust using [Lin
 ## What It Does
 
 - Loads the classic Iris dataset (150 samples, 4 features, 3 classes)
-- Trains two Decision Tree classifiers with different strategies (Gini vs Entropy)
+- Trains two Decision Tree classifiers (participant model from lib.rs + built-in Entropy tree)
 - Evaluates both models and displays results in formatted terminal tables
 
 ## Prerequisites
@@ -16,7 +16,7 @@ A workshop demo project that builds an Iris flower classifier in Rust using [Lin
 ## Quick Start
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/Tony363/vibe-rust-ml-workshop.git
 cd vibe-rust-ml-workshop
 cargo run --release
 ```
@@ -52,8 +52,8 @@ cargo run
 ```
 
 Trains two Decision Tree classifiers:
-- **Tree 1**: Gini impurity, max depth = 4
-- **Tree 2**: Entropy, unlimited depth
+- **Tree 1** (lib.rs): Entropy, max depth = 10
+- **Tree 2** (main.rs): Entropy, unlimited depth
 
 ### Step 4: Evaluation + Pretty Output (`step-4-complete`)
 
@@ -90,21 +90,21 @@ git checkout master
 
   Train/Test split: 120 training, 30 testing samples
 
-  Training Model 1: DecisionTree (Gini, depth=4)...
+  Training Model 1: DecisionTree (Entropy, depth=10)...
   -> Trained in ~130µs
   Training Model 2: Decision Tree (Entropy, unlimited depth)...
   -> Trained in ~150µs
 
   Model Comparison
-┌────────┬───────────────┬───────────┬──────────┬────────────┐
-│ Model  ┆ Split Quality ┆ Max Depth ┆ Accuracy ┆ Train Time │
-╞════════╪═══════════════╪═══════════╪══════════╪════════════╡
-│ Tree 1 ┆ Gini          ┆ 4         ┆ ~93-100% ┆ ~130µs     │
-├╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
-│ Tree 2 ┆ Entropy       ┆ None      ┆ ~93-100% ┆ ~150µs     │
-└────────┴───────────────┴───────────┴──────────┴────────────┘
+┌──────────────────────────────────┬───────────────┬───────────┬──────────┬────────────┐
+│ Model                            ┆ Split Quality ┆ Max Depth ┆ Accuracy ┆ Train Time │
+╞══════════════════════════════════╪═══════════════╪═══════════╪══════════╪════════════╡
+│ DecisionTree (Entropy, depth=10) ┆ -             ┆ -         ┆ ~93-100% ┆ ~130µs     │
+├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ Tree 2                           ┆ Entropy       ┆ None      ┆ ~93-100% ┆ ~150µs     │
+└──────────────────────────────────┴───────────────┴───────────┴──────────┴────────────┘
 
-  Confusion Matrix (Tree 1 -- Gini)
+  Confusion Matrix (DecisionTree (Entropy, depth=10))
 ┌────────────────────┬────────┬────────────┬───────────┐
 │ Actual \ Predicted ┆ Setosa ┆ Versicolor ┆ Virginica │
 ╞════════════════════╪════════╪════════════╪═══════════╡
@@ -143,6 +143,7 @@ vibe-rust-ml-workshop/
   README.md             # This file
   LEADERBOARD.md        # Current standings
   LEADERBOARD_RULES.md  # Submission rules and allowed crates
+  Vibe-Coding-a-Rust-ML-Pipeline.pptx  # Workshop slide deck
   .github/workflows/    # CI: checkpoint tests + leaderboard scoring
 ```
 
