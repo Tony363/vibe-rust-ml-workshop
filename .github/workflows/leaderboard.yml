@@ -2,6 +2,7 @@ name: ML Leaderboard
 
 on:
   pull_request:
+    branches: [submissions]
     types: [opened, synchronize]
 
 permissions:

@@ -118,7 +118,7 @@ git checkout master
 +----+---------+---------+---------+---------+------------+------------+
 ```
 
-Note: exact values vary per run due to random shuffling of the dataset.
+Note: scores are now deterministic (seeded RNG with seed=42) for fair leaderboard comparison.
 
 ## Project Structure
 
@@ -141,6 +141,31 @@ vibe-rust-ml-workshop/
 | [ndarray](https://crates.io/crates/ndarray) | N-dimensional arrays |
 | [comfy-table](https://crates.io/crates/comfy-table) | Pretty terminal tables |
 | [rand](https://crates.io/crates/rand) | Random number generation (shuffling) |
+
+## Workshop Challenge
+
+Think you can beat the baseline accuracy? Submit your own pipeline!
+
+### Quick Start
+
+```bash
+git checkout submissions
+git checkout -b my-submission
+# edit src/lib.rs -- change build_and_predict() to try different algorithms
+cargo run --bin score --release  # check your deterministic score locally
+git add -A && git commit -m "my submission"
+git push -u origin my-submission
+# open a PR targeting the 'submissions' branch
+```
+
+### Rules
+
+- Only modify `src/lib.rs` and `Cargo.toml`
+- Must use linfa algorithms
+- CI scores your `build_and_predict()` function with a fixed seed for fairness
+- CI will automatically post a leaderboard ranking on your PR
+
+See [LEADERBOARD.md](LEADERBOARD.md) for current standings.
 
 ## Resources
 

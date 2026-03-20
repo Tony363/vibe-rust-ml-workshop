@@ -3,9 +3,12 @@ use linfa::prelude::*;
 use linfa_trees::DecisionTree;
 use linfa_trees::SplitQuality;
 use ndarray::Axis;
-use rand::thread_rng;
+use rand::rngs::StdRng;
+use rand::SeedableRng;
 use std::time::Instant;
 use vibe_rust_ml_workshop::{build_and_predict, model_name};
+
+const RNG_SEED: u64 = 42;
 
 const CLASS_NAMES: [&str; 3] = ["Setosa", "Versicolor", "Virginica"];
 
@@ -31,7 +34,7 @@ fn main() {
     println!("{info_table}\n");
 
     // Shuffle and split into training (80%) and testing (20%) sets
-    let mut rng = thread_rng();
+    let mut rng = StdRng::seed_from_u64(RNG_SEED);
     let dataset = dataset.shuffle(&mut rng);
     let (train, test) = dataset.split_with_ratio(0.8);
     println!(
@@ -130,6 +133,10 @@ fn main() {
         ]);
     }
     println!("{pred_table}\n");
+
+    // Machine-readable score line for CI leaderboard
+    let best_acc = gini_acc.max(entropy_acc);
+    println!("LEADERBOARD_SCORE best={:.4} gini={:.4} entropy={:.4}", best_acc, gini_acc, entropy_acc);
 }
 
 fn print_confusion_matrix(actuals: &[usize], predictions: &[usize]) {
