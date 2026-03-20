@@ -3,7 +3,7 @@ name: ML Leaderboard
 on:
   pull_request:
     branches: [submissions]
-    types: [opened, synchronize]
+    types: [opened, synchronize, reopened]
 
 permissions:
   pull-requests: write
