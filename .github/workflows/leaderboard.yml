@@ -29,24 +29,34 @@ jobs:
       - name: Compile check
         run: cargo check
 
-      - name: Run scorer
-        id: score
+      - name: Run Iris scorer
+        id: score_iris
         run: |
           OUTPUT=$(cargo run --bin score --release)
+          echo "json=$OUTPUT" >> "$GITHUB_OUTPUT"
+
+      - name: Run Wine scorer
+        id: score_wine
+        run: |
+          OUTPUT=$(cargo run --bin score_wine --release)
           echo "json=$OUTPUT" >> "$GITHUB_OUTPUT"
 
       - name: Post leaderboard comment
         uses: actions/github-script@v7
         env:
-          SCORE_JSON: ${{ steps.score.outputs.json }}
+          IRIS_JSON: ${{ steps.score_iris.outputs.json }}
+          WINE_JSON: ${{ steps.score_wine.outputs.json }}
         with:
           script: |
             const MARKER = '<!-- ml-leaderboard -->';
-            const thisScore = JSON.parse(process.env.SCORE_JSON);
-            const thisScoreBlock = `<!-- score:${JSON.stringify(thisScore)} -->`;
+            const irisScore = JSON.parse(process.env.IRIS_JSON);
+            const wineScore = JSON.parse(process.env.WINE_JSON);
+            const combinedScore = { iris: irisScore, wine: wineScore };
+            const thisScoreBlock = `<!-- score:${JSON.stringify(combinedScore)} -->`;
 
             // Collect scores from all open PRs
-            const scores = [];
+            const irisScores = [];
+            const wineScores = [];
             const { data: prs } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -56,14 +66,10 @@ jobs:
 
             for (const pr of prs) {
               if (pr.number === context.issue.number) {
-                scores.push({
-                  pr: pr.number,
-                  author: pr.user.login,
-                  ...thisScore,
-                });
+                irisScores.push({ pr: pr.number, author: pr.user.login, ...irisScore });
+                wineScores.push({ pr: pr.number, author: pr.user.login, ...wineScore });
                 continue;
               }
-              // Find leaderboard comment on other PRs
               const { data: comments } = await github.rest.issues.listComments({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -75,11 +81,13 @@ jobs:
                   if (match) {
                     try {
                       const s = JSON.parse(match[1]);
-                      scores.push({
-                        pr: pr.number,
-                        author: pr.user.login,
-                        ...s,
-                      });
+                      if (s.iris) {
+                        irisScores.push({ pr: pr.number, author: pr.user.login, ...s.iris });
+                        wineScores.push({ pr: pr.number, author: pr.user.login, ...s.wine });
+                      } else {
+                        // Backwards compat: old format was just iris
+                        irisScores.push({ pr: pr.number, author: pr.user.login, ...s });
+                      }
                     } catch {}
                   }
                   break;
@@ -87,73 +95,93 @@ jobs:
               }
             }
 
-            // Sort by accuracy descending
-            scores.sort((a, b) => b.accuracy - a.accuracy);
+            function buildSection(title, dataset, thisScore, scores, baselineAcc) {
+              scores.sort((a, b) => b.accuracy - a.accuracy);
+              const medals = ['🥇', '🥈', '🥉'];
+              let table = '| Rank | PR | Author | Model | Accuracy |\n';
+              table += '|------|------|--------|-------|----------|\n';
+              for (let i = 0; i < scores.length; i++) {
+                const s = scores[i];
+                const rank = i < 3 ? medals[i] : `${i + 1}`;
+                const isYou = s.pr === context.issue.number ? ' **<- you**' : '';
+                table += `| ${rank} | #${s.pr} | @${s.author} | ${s.model_name} | ${(s.accuracy * 100).toFixed(1)}%${isYou} |\n`;
+              }
 
-            // Build leaderboard table
-            const medals = ['🥇', '🥈', '🥉'];
-            let table = '| Rank | PR | Author | Model | Accuracy |\n';
-            table += '|------|------|--------|-------|----------|\n';
-            for (let i = 0; i < scores.length; i++) {
-              const s = scores[i];
-              const rank = i < 3 ? medals[i] : `${i + 1}`;
-              const isYou = s.pr === context.issue.number ? ' **<- you**' : '';
-              table += `| ${rank} | #${s.pr} | @${s.author} | ${s.model_name} | ${(s.accuracy * 100).toFixed(1)}%${isYou} |\n`;
-            }
+              const pct = (thisScore.accuracy * 100).toFixed(1);
+              const baseline = { model_name: 'Baseline', accuracy: baselineAcc };
+              const chartEntries = [...scores, baseline];
+              chartEntries.sort((a, b) => b.accuracy - a.accuracy);
+              const chartLabels = chartEntries.map(s => {
+                const label = s.model_name.length > 20
+                  ? s.model_name.substring(0, 18) + '..'
+                  : s.model_name;
+                return `"${label}"`;
+              });
+              const chartValues = chartEntries.map(s => (s.accuracy * 100).toFixed(1));
+              const chart = [
+                '```mermaid',
+                'xychart-beta horizontal',
+                `  title "${dataset} Accuracy (%)"`,
+                `  x-axis [${chartLabels.join(', ')}]`,
+                `  bar [${chartValues.join(', ')}]`,
+                '```',
+              ].join('\n');
 
-            const pct = (thisScore.accuracy * 100).toFixed(1);
+              let cmSection = '';
+              if (thisScore.confusion_matrix) {
+                const cm = thisScore.confusion_matrix;
+                const classes = thisScore.classes || [];
+                cmSection = [
+                  '',
+                  `<details><summary>Confusion Matrix</summary>`,
+                  '',
+                  `| Actual \\ Predicted | ${classes.join(' | ')} |`,
+                  `|---|${classes.map(() => '---:').join('|')}|`,
+                  ...classes.map((name, i) =>
+                    `| **${name}** | ${cm[i].join(' | ')} |`
+                  ),
+                  '',
+                  '</details>',
+                ].join('\n');
+              }
 
-            // Build accuracy comparison chart
-            const baseline = { model_name: 'Baseline', accuracy: 0.9333 };
-            const chartEntries = [...scores, baseline];
-            chartEntries.sort((a, b) => b.accuracy - a.accuracy);
-            const chartLabels = chartEntries.map(s => {
-              const label = s.model_name.length > 20
-                ? s.model_name.substring(0, 18) + '..'
-                : s.model_name;
-              return `"${label}"`;
-            });
-            const chartValues = chartEntries.map(s => (s.accuracy * 100).toFixed(1));
-            const chart = [
-              '```mermaid',
-              'xychart-beta horizontal',
-              '  title "Accuracy Comparison (%)"',
-              `  x-axis [${chartLabels.join(', ')}]`,
-              `  bar [${chartValues.join(', ')}]`,
-              '```',
-            ].join('\n');
+              let metricsSection = '';
+              if (thisScore.per_class) {
+                metricsSection = [
+                  '',
+                  `<details><summary>Per-Class Metrics</summary>`,
+                  '',
+                  '| Class | Precision | Recall | F1 Score | Support |',
+                  '|-------|----------:|-------:|---------:|--------:|',
+                  ...thisScore.per_class.map(c =>
+                    `| ${c.name} | ${(c.precision * 100).toFixed(1)}% | ${(c.recall * 100).toFixed(1)}% | ${(c.f1 * 100).toFixed(1)}% | ${c.support} |`
+                  ),
+                  '',
+                  '</details>',
+                ].join('\n');
+              }
 
-            // Build confusion matrix table
-            let cmSection = '';
-            if (thisScore.confusion_matrix) {
-              const cm = thisScore.confusion_matrix;
-              const classes = thisScore.classes || ['Setosa', 'Versicolor', 'Virginica'];
-              cmSection = [
+              return [
+                `### ${title}`,
                 '',
-                '### Confusion Matrix',
+                `**Your score: ${pct}%** (${thisScore.correct}/${thisScore.total} correct) | Model: ${thisScore.model_name}`,
                 '',
-                `| Actual \\ Predicted | ${classes.join(' | ')} |`,
-                `|---|${classes.map(() => '---:').join('|')}|`,
-                ...classes.map((name, i) =>
-                  `| **${name}** | ${cm[i].join(' | ')} |`
-                ),
+                chart,
+                '',
+                '#### Rankings',
+                '',
+                table,
+                cmSection,
+                metricsSection,
               ].join('\n');
             }
 
-            // Build per-class metrics table
-            let metricsSection = '';
-            if (thisScore.per_class) {
-              metricsSection = [
-                '',
-                '### Per-Class Metrics',
-                '',
-                '| Class | Precision | Recall | F1 Score | Support |',
-                '|-------|----------:|-------:|---------:|--------:|',
-                ...thisScore.per_class.map(c =>
-                  `| ${c.name} | ${(c.precision * 100).toFixed(1)}% | ${(c.recall * 100).toFixed(1)}% | ${(c.f1 * 100).toFixed(1)}% | ${c.support} |`
-                ),
-              ].join('\n');
-            }
+            const irisSection = buildSection(
+              '🌸 Iris (Easy)', 'Iris', irisScore, irisScores, 0.9333
+            );
+            const wineSection = buildSection(
+              '🍷 Wine Quality (Hard)', 'Wine Quality', wineScore, wineScores, 0.5392
+            );
 
             const body = [
               MARKER,
@@ -161,20 +189,15 @@ jobs:
               '',
               '## ML Leaderboard',
               '',
-              `**Your score: ${pct}%** (${thisScore.correct}/${thisScore.total} correct) | Model: ${thisScore.model_name}`,
+              irisSection,
               '',
-              chart,
+              '---',
               '',
-              '### Rankings',
+              wineSection,
               '',
-              table,
-              cmSection,
-              metricsSection,
-              '',
-              `*Scored on Iris dataset with fixed seed (1). Only linfa algorithms allowed.*`,
+              `*Scored with fixed seed (1). Only linfa algorithms allowed.*`,
             ].join('\n');
 
-            // Find existing leaderboard comment
             const { data: existingComments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,

@@ -137,8 +137,9 @@ Note: the demo uses seed 42; the CI scorer (`src/bin/score.rs`) uses seed 1 for 
 vibe-rust-ml-workshop/
   Cargo.toml            # Dependencies: linfa, linfa-trees, linfa-datasets, ndarray, comfy-table, rand
   src/main.rs           # Complete pipeline (~170 lines)
-  src/lib.rs            # Participant-editable model (build_and_predict)
-  src/bin/score.rs      # Deterministic scorer for CI leaderboard
+  src/lib.rs            # Participant-editable models (Iris + Wine Quality)
+  src/bin/score.rs      # Iris scorer for CI leaderboard
+  src/bin/score_wine.rs # Wine Quality scorer for CI leaderboard (hard mode)
   WORKSHOP.md           # Speaker notes (45-min session breakdown)
   README.md             # This file
   LEADERBOARD.md        # Current standings
@@ -153,22 +154,28 @@ vibe-rust-ml-workshop/
 |-------|---------|
 | [linfa](https://crates.io/crates/linfa) | ML framework (scikit-learn for Rust) |
 | [linfa-trees](https://crates.io/crates/linfa-trees) | Decision Tree classifier |
-| [linfa-datasets](https://crates.io/crates/linfa-datasets) | Built-in datasets (Iris) |
+| [linfa-datasets](https://crates.io/crates/linfa-datasets) | Built-in datasets (Iris, Wine Quality) |
 | [ndarray](https://crates.io/crates/ndarray) | N-dimensional arrays |
 | [comfy-table](https://crates.io/crates/comfy-table) | Pretty terminal tables |
 | [rand](https://crates.io/crates/rand) | Random number generation (shuffling) |
 
 ## Workshop Challenge
 
-Think you can beat the baseline accuracy? Submit your own pipeline!
+Think you can beat the baseline? Two challenges, pick one or both!
+
+| Challenge | Dataset | Baseline | Beat this! |
+|-----------|---------|----------|------------|
+| **Iris (Easy)** | 150 samples, 4 features, 3 classes | 93.3% | Can you hit 100%? |
+| **Wine Quality (Hard)** | 1599 samples, 11 features, 6 classes | 53.9% | Can you break 65%? |
 
 ### Quick Start
 
 ```bash
 git checkout submissions
 git checkout -b my-submission
-# edit src/lib.rs -- change build_and_predict() to try different algorithms
-cargo run --bin score --release  # check your deterministic score locally
+# edit src/lib.rs -- change build_and_predict() and/or build_and_predict_wine()
+cargo run --bin score --release       # check Iris score locally
+cargo run --bin score_wine --release  # check Wine Quality score locally
 git add -A && git commit -m "my submission"
 git push -u origin my-submission
 # open a PR targeting the 'submissions' branch
@@ -178,15 +185,10 @@ git push -u origin my-submission
 
 - Only modify `src/lib.rs` and `Cargo.toml`
 - Must use linfa algorithms
-- CI scores your `build_and_predict()` function with a fixed seed for fairness
-- CI will automatically post a leaderboard comment on your PR with:
-  - Accuracy comparison chart (Mermaid bar chart)
-  - Ranked standings across all submissions
-  - Confusion matrix showing per-class predictions
-  - Per-class precision, recall, and F1 scores
-- When your PR is merged, the [LEADERBOARD.md](LEADERBOARD.md) on the `submissions` branch is updated automatically
+- CI scores both challenges with a fixed seed for fairness
+- CI will automatically post a combined leaderboard on your PR
 
-See [LEADERBOARD.md](LEADERBOARD.md) for current standings.
+See [LEADERBOARD.md](LEADERBOARD.md) for current standings and [LEADERBOARD_RULES.md](LEADERBOARD_RULES.md) for full rules.
 
 ## Resources
 
