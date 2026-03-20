@@ -1,6 +1,6 @@
 use linfa::prelude::*;
-use rand::rngs::StdRng;
 use rand::SeedableRng;
+use rand::rngs::StdRng;
 
 const SEED: u64 = 1;
 const SPLIT_RATIO: f32 = 0.8;
@@ -23,7 +23,8 @@ fn main() {
     let accuracy = correct as f64 / total as f64;
     let name = vibe_rust_ml_workshop::model_name();
 
+    let escaped_name = name.replace('\\', "\\\\").replace('"', "\\\"");
     println!(
-        r#"{{"accuracy":{accuracy:.4},"correct":{correct},"total":{total},"model_name":"{name}"}}"#
+        r#"{{"accuracy":{accuracy:.4},"correct":{correct},"total":{total},"model_name":"{escaped_name}"}}"#
     );
 }

@@ -1,10 +1,10 @@
-use comfy_table::{presets::UTF8_FULL, Table};
+use comfy_table::{Table, presets::UTF8_FULL};
 use linfa::prelude::*;
 use linfa_trees::DecisionTree;
 use linfa_trees::SplitQuality;
 use ndarray::Axis;
-use rand::rngs::StdRng;
 use rand::SeedableRng;
+use rand::rngs::StdRng;
 use std::time::Instant;
 use vibe_rust_ml_workshop::{build_and_predict, model_name};
 
@@ -66,13 +66,19 @@ fn main() {
     let entropy_pred = entropy_tree.predict(&test);
 
     // Confusion matrices via linfa (entropy model)
-    let entropy_cm = entropy_pred.confusion_matrix(&test).expect("confusion matrix");
+    let entropy_cm = entropy_pred
+        .confusion_matrix(&test)
+        .expect("confusion matrix");
     let entropy_acc = entropy_cm.accuracy();
 
     // Compute lib model accuracy manually (lib_pred is Array1<usize> from lib.rs)
     let actuals: Vec<usize> = test.as_targets().iter().copied().collect();
     let lib_preds: Vec<usize> = lib_pred.iter().copied().collect();
-    let lib_correct = lib_preds.iter().zip(actuals.iter()).filter(|(p, a)| p == a).count();
+    let lib_correct = lib_preds
+        .iter()
+        .zip(actuals.iter())
+        .filter(|(p, a)| p == a)
+        .count();
     let lib_acc = lib_correct as f64 / actuals.len() as f64;
 
     // --- Model Comparison Table ---
@@ -111,7 +117,13 @@ fn main() {
     let mut pred_table = Table::new();
     pred_table.load_preset(UTF8_FULL);
     pred_table.set_header(vec![
-        "#", "Sepal L", "Sepal W", "Petal L", "Petal W", "Actual", "Predicted",
+        "#",
+        "Sepal L",
+        "Sepal W",
+        "Petal L",
+        "Petal W",
+        "Actual",
+        "Predicted",
     ]);
 
     let records = test.records();
@@ -136,7 +148,10 @@ fn main() {
 
     // Machine-readable score line for CI leaderboard
     let best_acc = lib_acc.max(entropy_acc.into());
-    println!("LEADERBOARD_SCORE best={:.4} lib={:.4} entropy={:.4}", best_acc, lib_acc, entropy_acc);
+    println!(
+        "LEADERBOARD_SCORE best={:.4} lib={:.4} entropy={:.4}",
+        best_acc, lib_acc, entropy_acc
+    );
 }
 
 fn print_confusion_matrix(actuals: &[usize], predictions: &[usize]) {

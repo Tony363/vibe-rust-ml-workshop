@@ -4,7 +4,7 @@ Scores from the workshop challenge. CI scores every PR using a deterministic sco
 
 | Rank | Participant | Accuracy | Model | PR |
 |------|-------------|----------|-------|----|
-| -    | Baseline    | 96.7%    | DecisionTree (Gini, depth=4) | - |
+| -    | Baseline    | 93.3%    | DecisionTree (Entropy, depth=10) | - |
 
 ## How to Submit
 

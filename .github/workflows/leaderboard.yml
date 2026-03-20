@@ -32,15 +32,17 @@ jobs:
       - name: Run scorer
         id: score
         run: |
-          OUTPUT=$(cargo run --bin score --release 2>/dev/null)
+          OUTPUT=$(cargo run --bin score --release)
           echo "json=$OUTPUT" >> "$GITHUB_OUTPUT"
 
       - name: Post leaderboard comment
         uses: actions/github-script@v7
+        env:
+          SCORE_JSON: ${{ steps.score.outputs.json }}
         with:
           script: |
             const MARKER = '<!-- ml-leaderboard -->';
-            const thisScore = JSON.parse('${{ steps.score.outputs.json }}');
+            const thisScore = JSON.parse(process.env.SCORE_JSON);
             const thisScoreBlock = `<!-- score:${JSON.stringify(thisScore)} -->`;
 
             // Collect scores from all open PRs
@@ -49,6 +51,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
+              base: 'submissions',
             });
 
             for (const pr of prs) {
