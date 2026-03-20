@@ -3,7 +3,7 @@ use linfa::prelude::*;
 use linfa_trees::{DecisionTree, SplitQuality};
 use ndarray::{Array1, Array2};
 
-/// Participants: modify this function to build your best model!
+/// Shallow Entropy tree with depth=3
 /// You can use any linfa algorithm (trees, SVM, KNN, clustering, etc.)
 /// but must return predictions as Array1<usize> for the 3 Iris classes.
 pub fn build_and_predict(
