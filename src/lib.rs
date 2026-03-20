@@ -13,6 +13,11 @@ pub fn build_and_predict(
     let model = DecisionTree::params()
         .split_quality(SplitQuality::Gini)
         .max_depth(None)
+<<<<<<< HEAD
+=======
+        .min_weight_split(1.0)
+        .min_weight_leaf(1.0)
+>>>>>>> 81374f9 (Medina Creative: Gini no depth limit, 96.67% Iris)
         .fit(train)
         .expect("training failed");
     model.predict(test_features)
@@ -20,7 +25,11 @@ pub fn build_and_predict(
 
 /// Name your model (shown on the leaderboard)
 pub fn model_name() -> &'static str {
+<<<<<<< HEAD
     "DecisionTree (Gini, unlimited depth)"
+=======
+    "Medina Creative Model (Gini, no depth limit)"
+>>>>>>> 81374f9 (Medina Creative: Gini no depth limit, 96.67% Iris)
 }
 
 // ===================== HARD MODE: Wine Quality =====================
