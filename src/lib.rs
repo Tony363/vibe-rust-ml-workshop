@@ -11,8 +11,7 @@ pub fn build_and_predict(
     test_features: &Array2<f64>,
 ) -> Array1<usize> {
     let model = DecisionTree::params()
-        .split_quality(SplitQuality::Entropy)
-        .max_depth(Some(10))
+        .split_quality(SplitQuality::Gini)
         .fit(train)
         .expect("training failed");
     model.predict(test_features)
@@ -20,5 +19,5 @@ pub fn build_and_predict(
 
 /// Name your model (shown on the leaderboard)
 pub fn model_name() -> &'static str {
-    "DecisionTree (Entropy, depth=10)"
+    "DecisionTree (Gini, unlimited)"
 }
