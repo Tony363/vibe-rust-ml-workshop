@@ -6,7 +6,7 @@ Achieve the highest accuracy on the Iris test set.
 
 ## How to Submit
 
-1. Create a branch from `master`
+1. Create a branch from `submissions`
 2. Edit `src/lib.rs` -- modify `build_and_predict()` and `model_name()`
 3. Open a PR
 4. A GitHub Action will score your model and post a ranked leaderboard

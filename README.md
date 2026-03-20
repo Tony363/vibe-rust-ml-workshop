@@ -129,17 +129,21 @@ git checkout master
 └────┴─────────┴─────────┴─────────┴─────────┴────────────┴────────────┘
 ```
 
-Note: scores are now deterministic (seeded RNG with seed=42) for fair leaderboard comparison.
+Note: the demo uses seed 42; the CI scorer (`src/bin/score.rs`) uses seed 1 for fair leaderboard comparison.
 
 ## Project Structure
 
 ```
 vibe-rust-ml-workshop/
-  Cargo.toml          # Dependencies: linfa, comfy-table, ndarray, rand
-  src/main.rs         # Complete pipeline (~170 lines)
-  WORKSHOP.md         # Speaker notes (45-min session breakdown)
-  README.md           # This file
-  .github/workflows/  # CI to verify all checkpoints compile
+  Cargo.toml            # Dependencies: linfa, linfa-trees, linfa-datasets, ndarray, comfy-table, rand
+  src/main.rs           # Complete pipeline (~170 lines)
+  src/lib.rs            # Participant-editable model (build_and_predict)
+  src/bin/score.rs      # Deterministic scorer for CI leaderboard
+  WORKSHOP.md           # Speaker notes (45-min session breakdown)
+  README.md             # This file
+  LEADERBOARD.md        # Current standings
+  LEADERBOARD_RULES.md  # Submission rules and allowed crates
+  .github/workflows/    # CI: checkpoint tests + leaderboard scoring
 ```
 
 ## Dependencies
