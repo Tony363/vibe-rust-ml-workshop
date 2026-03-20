@@ -4,28 +4,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Workshop demo project: an Iris flower classifier in Rust using the Linfa ML framework. Demonstrates the "vibe coding" workflow in a 45-min workshop. The project includes a library crate with a participant-editable model, a demo binary, and a CI-powered leaderboard system.
+Workshop demo project: ML classifiers in Rust using the Linfa ML framework. Demonstrates the "vibe coding" workflow in a 45-min workshop. The project includes a library crate with participant-editable models (Iris + Wine Quality), a demo binary, and a CI-powered dual leaderboard system.
 
 Git tags serve as workshop checkpoints (`step-1-scaffold` through `step-4-complete`).
 
 ## Build & Run Commands
 
 ```bash
-cargo build                    # debug build
-cargo run --release            # run demo (seed=42, two models compared)
-cargo run --bin score --release  # run deterministic scorer (seed=1, lib.rs model only)
-cargo clippy                   # lint
-cargo fmt                      # format
-cargo test                     # run tests (none currently exist)
+cargo build                         # debug build
+cargo run --release                 # run demo (seed=42, two models compared)
+cargo run --bin score --release     # run Iris scorer (seed=1, lib.rs model only)
+cargo run --bin score_wine --release  # run Wine Quality scorer (seed=1, lib.rs wine model)
+cargo clippy                        # lint
+cargo fmt                           # format
+cargo test                          # run tests (none currently exist)
 ```
 
 ## Architecture
 
-Library crate (`src/lib.rs`) + two binaries (`src/main.rs`, `src/bin/score.rs`):
+Library crate (`src/lib.rs`) + three binaries (`src/main.rs`, `src/bin/score.rs`, `src/bin/score_wine.rs`):
 
-### src/lib.rs -- Participant model
-- `build_and_predict(train, test_features)` -- trains a model and returns predictions
-- `model_name()` -- returns model name for display/leaderboard
+### src/lib.rs -- Participant models
+- `build_and_predict(train, test_features)` -- Iris model, returns predictions
+- `model_name()` -- Iris model name for display/leaderboard
+- `build_and_predict_wine(train, test_features)` -- Wine Quality model (hard mode)
+- `model_name_wine()` -- Wine model name for display/leaderboard
 - This is the only file participants edit for leaderboard submissions
 
 ### src/main.rs -- Demo binary
@@ -35,14 +38,20 @@ Library crate (`src/lib.rs`) + two binaries (`src/main.rs`, `src/bin/score.rs`):
 4. **Evaluation**: Accuracy, confusion matrix, sample predictions
 5. **Output**: Tables rendered with `comfy-table` using `UTF8_FULL` preset
 
-### src/bin/score.rs -- Deterministic scorer
+### src/bin/score.rs -- Iris scorer
 - Uses fixed seed=1 (different from demo's seed=42) for fair comparison
-- Runs only the lib.rs model, outputs JSON with accuracy/model_name
+- Runs only the lib.rs Iris model, outputs JSON with accuracy/model_name
 - Used by CI to score leaderboard submissions
+
+### src/bin/score_wine.rs -- Wine Quality scorer (hard mode)
+- Same seed=1, 80/20 split against `linfa_datasets::winequality()` (1599 samples, 11 features, 6 classes)
+- Baseline ~53.9% accuracy (Gini, depth=5) -- much harder than Iris due to class imbalance and overlap
+- Uses Gini depth=5 for deterministic baseline (deeper trees have non-deterministic behavior in linfa)
+- Dynamic class discovery (handles models that predict classes not in test set)
 
 ### Leaderboard system
 - Participants branch from `submissions`, edit `src/lib.rs`, open a PR
-- `.github/workflows/leaderboard.yml` scores the PR and posts a ranked leaderboard comment
+- `.github/workflows/leaderboard.yml` scores both Iris and Wine, posts a combined leaderboard comment
 - Rules in `LEADERBOARD_RULES.md`, standings in `LEADERBOARD.md`
 
 ## Key Dependencies
