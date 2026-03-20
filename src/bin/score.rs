@@ -2,7 +2,7 @@ use linfa::prelude::*;
 use rand::rngs::StdRng;
 use rand::SeedableRng;
 
-const SEED: u64 = 42;
+const SEED: u64 = 1;
 const SPLIT_RATIO: f32 = 0.8;
 
 fn main() {

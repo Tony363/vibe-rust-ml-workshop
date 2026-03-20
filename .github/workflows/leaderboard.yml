@@ -107,7 +107,7 @@ jobs:
               `**Your score: ${pct}%** (${thisScore.correct}/${thisScore.total} correct) | Model: ${thisScore.model_name}`,
               '',
               table,
-              `*Scored on Iris dataset with fixed seed (42). Only linfa algorithms allowed.*`,
+              `*Scored on Iris dataset with fixed seed (1). Only linfa algorithms allowed.*`,
             ].join('\n');
 
             // Find existing leaderboard comment
