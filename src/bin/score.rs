@@ -1,6 +1,6 @@
 use linfa::prelude::*;
-use rand::rngs::StdRng;
 use rand::SeedableRng;
+use rand::rngs::StdRng;
 
 const SEED: u64 = 1;
 const SPLIT_RATIO: f32 = 0.8;
