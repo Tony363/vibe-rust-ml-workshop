@@ -7,7 +7,6 @@ default-run = "vibe-rust-ml-workshop"
 [dependencies]
 linfa = "0.7"
 linfa-trees = "0.7"
-linfa-nn = "0.7"
 linfa-datasets = { version = "0.7", features = ["iris", "winequality"] }
 ndarray = "0.15"
 comfy-table = "7"

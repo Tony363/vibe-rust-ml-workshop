@@ -50,7 +50,7 @@ pub fn build_and_predict_wine(
         out
     };
 
-    let norm_train_features = normalise(&train_features.to_owned());
+    let norm_train_features = normalise(train_features);
     let norm_train = DatasetBase::new(norm_train_features, train.targets().to_owned());
     let norm_test = normalise(test_features);
 
