@@ -37,7 +37,7 @@ Use the show of hands to calibrate. If most people are Python users, lean into c
 - **What we will build today:**
   - An Iris flower classifier -- the "hello world" of ML.
   - We will load data, train a decision tree, evaluate it, and produce beautiful terminal output.
-  - All in about 130 lines of Rust, written with AI assistance.
+  - All in about 170 lines of Rust, written with AI assistance.
 
 **Transition:** "Let's stop talking about it and start building. I'm going to open my terminal and we will scaffold this project together."
 
@@ -108,7 +108,7 @@ Say to the audience: "One of the beautiful things about live coding is that thin
 - **Add comfy-table formatting:**
   - Use `comfy-table` to render the confusion matrix as a nicely formatted ASCII table in the terminal.
   - This is a great visual moment -- the audience sees a professional-looking output appear.
-  - Key message: "This is production-quality output from about 130 lines of Rust. No Jupyter notebook, no matplotlib. Just a binary you can ship anywhere."
+  - Key message: "This is production-quality output from about 170 lines of Rust. No Jupyter notebook, no matplotlib. Just a binary you can ship anywhere."
 
 - **Optional: add per-class metrics** (precision, recall) if time allows.
 

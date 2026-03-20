@@ -74,48 +74,59 @@ git checkout master
 ```
   Vibe Rust ML Workshop -- Iris Classification
 
-+---------------+------------------------------------------------------+
-| Property      | Value                                                |
-+===============+======================================================+
-| Dataset       | Iris                                                 |
-| Samples       | 150                                                  |
-| Features      | 4                                                    |
-| Classes       | 3 (Setosa, Versicolor, Virginica)                    |
-| Feature Names | sepal length, sepal width, petal length, petal width |
-+---------------+------------------------------------------------------+
+┌───────────────┬──────────────────────────────────────────────────────┐
+│ Property      ┆ Value                                                │
+╞═══════════════╪══════════════════════════════════════════════════════╡
+│ Dataset       ┆ Iris                                                 │
+├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ Samples       ┆ 150                                                  │
+├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ Features      ┆ 4                                                    │
+├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ Classes       ┆ 3 (Setosa, Versicolor, Virginica)                    │
+├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ Feature Names ┆ sepal length, sepal width, petal length, petal width │
+└───────────────┴──────────────────────────────────────────────────────┘
 
   Train/Test split: 120 training, 30 testing samples
 
-  Training Model 1: Decision Tree (Gini, depth=4)...
-  -> Trained in ~130us
+  Training Model 1: DecisionTree (Gini, depth=4)...
+  -> Trained in ~130µs
   Training Model 2: Decision Tree (Entropy, unlimited depth)...
-  -> Trained in ~150us
+  -> Trained in ~150µs
 
   Model Comparison
-+--------+---------------+-----------+----------+------------+
-| Model  | Split Quality | Max Depth | Accuracy | Train Time |
-+========+===============+===========+==========+============+
-| Tree 1 | Gini          | 4         | ~93-100% | ~130us     |
-| Tree 2 | Entropy       | None      | ~93-100% | ~150us     |
-+--------+---------------+-----------+----------+------------+
+┌────────┬───────────────┬───────────┬──────────┬────────────┐
+│ Model  ┆ Split Quality ┆ Max Depth ┆ Accuracy ┆ Train Time │
+╞════════╪═══════════════╪═══════════╪══════════╪════════════╡
+│ Tree 1 ┆ Gini          ┆ 4         ┆ ~93-100% ┆ ~130µs     │
+├╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ Tree 2 ┆ Entropy       ┆ None      ┆ ~93-100% ┆ ~150µs     │
+└────────┴───────────────┴───────────┴──────────┴────────────┘
 
   Confusion Matrix (Tree 1 -- Gini)
-+--------------------+--------+------------+-----------+
-| Actual \ Predicted | Setosa | Versicolor | Virginica |
-+====================+========+============+===========+
-| Setosa             | ~10    | 0          | 0         |
-| Versicolor         | 0      | ~10        | 0-1       |
-| Virginica          | 0      | 0-1        | ~10       |
-+--------------------+--------+------------+-----------+
+┌────────────────────┬────────┬────────────┬───────────┐
+│ Actual \ Predicted ┆ Setosa ┆ Versicolor ┆ Virginica │
+╞════════════════════╪════════╪════════════╪═══════════╡
+│ Setosa             ┆ ~10    ┆ 0          ┆ 0         │
+├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌┤
+│ Versicolor         ┆ 0      ┆ ~10        ┆ 0-1       │
+├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌┤
+│ Virginica          ┆ 0      ┆ 0-1        ┆ ~10       │
+└────────────────────┴────────┴────────────┴───────────┘
 
   Sample Predictions (first 10 test samples)
-+----+---------+---------+---------+---------+------------+------------+
-| #  | Sepal L | Sepal W | Petal L | Petal W | Actual     | Predicted  |
-+====+=========+=========+=========+=========+============+============+
-| 1  | 5.0     | 3.3     | 1.4     | 0.2     | Setosa     | Setosa     |
-| 2  | 6.7     | 2.5     | 5.8     | 1.8     | Virginica  | Virginica  |
-| ...| ...     | ...     | ...     | ...     | ...        | ...        |
-+----+---------+---------+---------+---------+------------+------------+
+┌────┬─────────┬─────────┬─────────┬─────────┬────────────┬────────────┐
+│ #  ┆ Sepal L ┆ Sepal W ┆ Petal L ┆ Petal W ┆ Actual     ┆ Predicted  │
+╞════╪═════════╪═════════╪═════════╪═════════╪════════════╪════════════╡
+│ 1  ┆ 5.0     ┆ 3.4     ┆ 1.5     ┆ 0.2     ┆ Setosa     ┆ Setosa     │
+├╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ 2  ┆ 6.8     ┆ 3.2     ┆ 5.9     ┆ 2.3     ┆ Virginica  ┆ Virginica  │
+├╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ .. ┆ ...     ┆ ...     ┆ ...     ┆ ...     ┆ ...        ┆ ...        │
+├╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ 10 ┆ 6.9     ┆ 3.1     ┆ 5.4     ┆ 2.1     ┆ Virginica  ┆ Virginica  │
+└────┴─────────┴─────────┴─────────┴─────────┴────────────┴────────────┘
 ```
 
 Note: scores are now deterministic (seeded RNG with seed=42) for fair leaderboard comparison.
@@ -125,7 +136,7 @@ Note: scores are now deterministic (seeded RNG with seed=42) for fair leaderboar
 ```
 vibe-rust-ml-workshop/
   Cargo.toml          # Dependencies: linfa, comfy-table, ndarray, rand
-  src/main.rs         # Complete pipeline (~140 lines)
+  src/main.rs         # Complete pipeline (~170 lines)
   WORKSHOP.md         # Speaker notes (45-min session breakdown)
   README.md           # This file
   .github/workflows/  # CI to verify all checkpoints compile

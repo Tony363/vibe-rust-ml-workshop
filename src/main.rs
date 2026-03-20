@@ -135,7 +135,7 @@ fn main() {
     println!("{pred_table}\n");
 
     // Machine-readable score line for CI leaderboard
-    let best_acc = gini_acc.max(entropy_acc);
+    let best_acc = gini_acc.max(entropy_acc.into());
     println!("LEADERBOARD_SCORE best={:.4} gini={:.4} entropy={:.4}", best_acc, gini_acc, entropy_acc);
 }
 
