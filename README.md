@@ -10,7 +10,7 @@ A workshop demo project that builds an Iris flower classifier in Rust using [Lin
 
 ## Prerequisites
 
-- **Rust toolchain** (1.70+ stable): [Install via rustup](https://rustup.rs/)
+- **Rust toolchain** (1.85+ stable): [Install via rustup](https://rustup.rs/)
 - **Git** (to navigate workshop checkpoints)
 
 ## Quick Start
