@@ -34,8 +34,8 @@ Only modify these two functions in `src/lib.rs`:
 
 ## Scoring
 
-- Fixed random seed: `1`
-- Train/test split: 60/40
+- Fixed random seed: `42`
+- Train/test split: 80/20
 - Metric: accuracy = correct predictions / total test samples
 - Deterministic -- same code always gets the same score
 

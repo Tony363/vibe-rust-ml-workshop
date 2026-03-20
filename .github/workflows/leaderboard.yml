@@ -40,7 +40,14 @@ jobs:
           script: |
             const MARKER = '<!-- ml-leaderboard -->';
             const thisScore = JSON.parse('${{ steps.score.outputs.json }}');
-            const thisScoreBlock = `<!-- score:${JSON.stringify(thisScore)} -->`;
+            // Store only lightweight fields in the hidden score block (other PRs only need these)
+            const scoreForBlock = {
+              accuracy: thisScore.accuracy,
+              correct: thisScore.correct,
+              total: thisScore.total,
+              model_name: thisScore.model_name,
+            };
+            const thisScoreBlock = `<!-- score:${JSON.stringify(scoreForBlock)} -->`;
 
             // Collect scores from all open PRs
             const scores = [];
@@ -55,11 +62,10 @@ jobs:
                 scores.push({
                   pr: pr.number,
                   author: pr.user.login,
-                  ...thisScore,
+                  ...scoreForBlock,
                 });
                 continue;
               }
-              // Find leaderboard comment on other PRs
               const { data: comments } = await github.rest.issues.listComments({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -86,8 +92,8 @@ jobs:
             // Sort by accuracy descending
             scores.sort((a, b) => b.accuracy - a.accuracy);
 
-            // Build leaderboard table
-            const medals = ['🥇', '🥈', '🥉'];
+            // === Leaderboard Table ===
+            const medals = ['\u{1F947}', '\u{1F948}', '\u{1F949}'];
             let table = '| Rank | PR | Author | Model | Accuracy |\n';
             table += '|------|------|--------|-------|----------|\n';
             for (let i = 0; i < scores.length; i++) {
@@ -97,6 +103,84 @@ jobs:
               table += `| ${rank} | #${s.pr} | @${s.author} | ${s.model_name} | ${(s.accuracy * 100).toFixed(1)}%${isYou} |\n`;
             }
 
+            // === Visualization 1: Leaderboard Accuracy Chart ===
+            let leaderboardChart = '';
+            if (scores.length > 0) {
+              const authors = scores.map(s => `"@${s.author}"`).join(', ');
+              const accs = scores.map(s => (s.accuracy * 100).toFixed(1)).join(', ');
+              const minAcc = Math.max(0, Math.floor(Math.min(...scores.map(s => s.accuracy * 100)) - 5));
+              leaderboardChart = [
+                '### Leaderboard Chart',
+                '',
+                '```mermaid',
+                'xychart-beta',
+                '  title "Accuracy by Participant"',
+                `  x-axis [${authors}]`,
+                `  y-axis "Accuracy %" ${minAcc} --> 100`,
+                `  bar [${accs}]`,
+                '```',
+              ].join('\n');
+            }
+
+            // === Visualization 2: Per-Class Accuracy Bars ===
+            const perClass = thisScore.per_class || [];
+            let perClassChart = '';
+            if (perClass.length > 0) {
+              const classNames = perClass.map(c => `"${c.name}"`).join(', ');
+              const classAccs = perClass.map(c =>
+                c.total > 0 ? ((c.correct / c.total) * 100).toFixed(1) : '0.0'
+              ).join(', ');
+              perClassChart = [
+                '### Per-Class Accuracy',
+                '',
+                '```mermaid',
+                'xychart-beta',
+                '  title "Accuracy by Iris Class"',
+                `  x-axis [${classNames}]`,
+                '  y-axis "Accuracy %" 0 --> 100',
+                `  bar [${classAccs}]`,
+                '```',
+              ].join('\n');
+            }
+
+            // === Visualization 3: Prediction Breakdown (Pie) ===
+            const incorrect = thisScore.total - thisScore.correct;
+            let pieChart = [
+              '### Prediction Breakdown',
+              '',
+              '```mermaid',
+              'pie title Prediction Results',
+              `  "Correct (${thisScore.correct})" : ${thisScore.correct}`,
+              `  "Incorrect (${incorrect})" : ${incorrect}`,
+              '```',
+            ].join('\n');
+
+            // === Visualization 4: Confusion Matrix Heatmap ===
+            const cm = thisScore.confusion_matrix || [];
+            const classLabels = (perClass.length > 0)
+              ? perClass.map(c => c.name)
+              : ['Class 0', 'Class 1', 'Class 2'];
+            let cmTable = '';
+            if (cm.length === 3) {
+              cmTable = '### Confusion Matrix\n\n';
+              cmTable += `| | **Pred: ${classLabels[0]}** | **Pred: ${classLabels[1]}** | **Pred: ${classLabels[2]}** |\n`;
+              cmTable += '|---|:---:|:---:|:---:|\n';
+              for (let i = 0; i < 3; i++) {
+                let row = `| **${classLabels[i]}** |`;
+                for (let j = 0; j < 3; j++) {
+                  const val = cm[i][j];
+                  // Diagonal = correct (green), off-diagonal with value = misclassified (red)
+                  if (i === j) {
+                    row += val > 0 ? ` \u{1F7E9} ${val} |` : ` ${val} |`;
+                  } else {
+                    row += val > 0 ? ` \u{1F7E5} ${val} |` : ` \u{2022} |`;
+                  }
+                }
+                cmTable += row + '\n';
+              }
+            }
+
+            // === Assemble full comment body ===
             const pct = (thisScore.accuracy * 100).toFixed(1);
             const body = [
               MARKER,
@@ -107,7 +191,19 @@ jobs:
               `**Your score: ${pct}%** (${thisScore.correct}/${thisScore.total} correct) | Model: ${thisScore.model_name}`,
               '',
               table,
-              `*Scored on Iris dataset with fixed seed (1). Only linfa algorithms allowed.*`,
+              '---',
+              '',
+              '## Model Performance',
+              '',
+              leaderboardChart,
+              '',
+              perClassChart,
+              '',
+              pieChart,
+              '',
+              cmTable,
+              '',
+              `*Scored on Iris dataset with fixed seed (42). Only linfa algorithms allowed.*`,
             ].join('\n');
 
             // Find existing leaderboard comment
