@@ -5,7 +5,7 @@
 **What did you change?**
 <!-- Describe your approach: hyperparameters, algorithms, split ratio, etc. -->
 
-**Local accuracy (from `cargo run --release`):**
+**Local accuracy (from `cargo run --bin score --release`):**
 <!-- Paste the LEADERBOARD_SCORE line from your output -->
 
 ---
