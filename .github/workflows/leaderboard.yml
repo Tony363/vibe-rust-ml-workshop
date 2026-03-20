@@ -102,6 +102,59 @@ jobs:
             }
 
             const pct = (thisScore.accuracy * 100).toFixed(1);
+
+            // Build accuracy comparison chart
+            const baseline = { model_name: 'Baseline', accuracy: 0.9333 };
+            const chartEntries = [...scores, baseline];
+            chartEntries.sort((a, b) => b.accuracy - a.accuracy);
+            const chartLabels = chartEntries.map(s => {
+              const label = s.model_name.length > 20
+                ? s.model_name.substring(0, 18) + '..'
+                : s.model_name;
+              return `"${label}"`;
+            });
+            const chartValues = chartEntries.map(s => (s.accuracy * 100).toFixed(1));
+            const chart = [
+              '```mermaid',
+              'xychart-beta horizontal',
+              '  title "Accuracy Comparison (%)"',
+              `  x-axis [${chartLabels.join(', ')}]`,
+              `  bar [${chartValues.join(', ')}]`,
+              '```',
+            ].join('\n');
+
+            // Build confusion matrix table
+            let cmSection = '';
+            if (thisScore.confusion_matrix) {
+              const cm = thisScore.confusion_matrix;
+              const classes = thisScore.classes || ['Setosa', 'Versicolor', 'Virginica'];
+              cmSection = [
+                '',
+                '### Confusion Matrix',
+                '',
+                `| Actual \\ Predicted | ${classes.join(' | ')} |`,
+                `|${classes.map(() => '---:').join('|')}|---:|`,
+                ...classes.map((name, i) =>
+                  `| **${name}** | ${cm[i].join(' | ')} |`
+                ),
+              ].join('\n');
+            }
+
+            // Build per-class metrics table
+            let metricsSection = '';
+            if (thisScore.per_class) {
+              metricsSection = [
+                '',
+                '### Per-Class Metrics',
+                '',
+                '| Class | Precision | Recall | F1 Score | Support |',
+                '|-------|----------:|-------:|---------:|--------:|',
+                ...thisScore.per_class.map(c =>
+                  `| ${c.name} | ${(c.precision * 100).toFixed(1)}% | ${(c.recall * 100).toFixed(1)}% | ${(c.f1 * 100).toFixed(1)}% | ${c.support} |`
+                ),
+              ].join('\n');
+            }
+
             const body = [
               MARKER,
               thisScoreBlock,
@@ -110,7 +163,14 @@ jobs:
               '',
               `**Your score: ${pct}%** (${thisScore.correct}/${thisScore.total} correct) | Model: ${thisScore.model_name}`,
               '',
+              chart,
+              '',
+              '### Rankings',
+              '',
               table,
+              cmSection,
+              metricsSection,
+              '',
               `*Scored on Iris dataset with fixed seed (1). Only linfa algorithms allowed.*`,
             ].join('\n');
 
