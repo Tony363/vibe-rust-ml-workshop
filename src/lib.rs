@@ -3,7 +3,7 @@ use linfa::prelude::*;
 use linfa_trees::{DecisionTree, SplitQuality};
 use ndarray::{Array1, Array2};
 
-/// Shallow Entropy tree with depth=3
+/// Gini tree with unlimited depth
 /// You can use any linfa algorithm (trees, SVM, KNN, clustering, etc.)
 /// but must return predictions as Array1<usize> for the 3 Iris classes.
 pub fn build_and_predict(
@@ -11,8 +11,7 @@ pub fn build_and_predict(
     test_features: &Array2<f64>,
 ) -> Array1<usize> {
     let model = DecisionTree::params()
-        .split_quality(SplitQuality::Entropy)
-        .max_depth(Some(3))
+        .split_quality(SplitQuality::Gini)
         .fit(train)
         .expect("training failed");
     model.predict(test_features)
@@ -20,5 +19,5 @@ pub fn build_and_predict(
 
 /// Name your model (shown on the leaderboard)
 pub fn model_name() -> &'static str {
-    "DecisionTree (Entropy, depth=3)"
+    "DecisionTree (Gini, unlimited)"
 }
