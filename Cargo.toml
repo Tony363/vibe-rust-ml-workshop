@@ -2,6 +2,7 @@
 name = "vibe-rust-ml-workshop"
 version = "0.1.0"
 edition = "2024"
+default-run = "vibe-rust-ml-workshop"
 
 [dependencies]
 linfa = "0.7"

@@ -68,8 +68,8 @@ Use the show of hands to calibrate. If most people are Python users, lean into c
 - Add a train/test split. Explain briefly:
   - "We split the data so we can test our model on data it has never seen. This is ML 101 -- you do the same thing in scikit-learn."
 - Build and train a decision tree classifier.
-  - Walk through the builder pattern: `DecisionTree::params().max_depth(Some(5)).fit(&train)`.
-  - Explain: "This reads almost like English. Set max depth to 5, then fit on our training data. The builder pattern is common in Rust."
+  - Walk through the builder pattern: `DecisionTree::params().max_depth(Some(4)).fit(&train)`.
+  - Explain: "This reads almost like English. Set max depth to 4, then fit on our training data. The builder pattern is common in Rust."
 - Run the code and show it compiles and trains.
 
 **Git tag: step-2-data** (after data loading works)
@@ -133,7 +133,7 @@ Say to the audience: "We have a working ML pipeline. Now let's do some real vibe
 
 **Suggested options to offer if the room is quiet:**
 
-- Change `max_depth` from 5 to 3 or 10 -- how does accuracy change?
+- Change `max_depth` from 4 to 3 or 10 -- how does accuracy change?
 - Switch from Gini impurity to Entropy as the split criterion -- does it matter?
 - Add a feature importance display -- which measurements matter most for classifying irises?
 - Change the train/test ratio from 80/20 to 60/40 -- how robust is our model?

@@ -5,6 +5,7 @@ use linfa_trees::SplitQuality;
 use ndarray::Axis;
 use rand::thread_rng;
 use std::time::Instant;
+use vibe_rust_ml_workshop::{build_and_predict, model_name};
 
 const CLASS_NAMES: [&str; 3] = ["Setosa", "Versicolor", "Virginica"];
 
@@ -39,14 +40,10 @@ fn main() {
         test.nsamples()
     );
 
-    // --- Model 1: Decision Tree (Gini, max_depth=4) ---
-    println!("  Training Model 1: Decision Tree (Gini, depth=4)...");
+    // --- Model 1: Decision Tree (Gini, max_depth=4) via lib.rs ---
+    println!("  Training Model 1: {}...", model_name());
     let t1 = Instant::now();
-    let gini_tree = DecisionTree::params()
-        .split_quality(SplitQuality::Gini)
-        .max_depth(Some(4))
-        .fit(&train)
-        .expect("Failed to train Gini tree");
+    let gini_pred = build_and_predict(&train, test.records());
     let t1_elapsed = t1.elapsed();
     println!("  -> Trained in {:.2?}", t1_elapsed);
 
@@ -62,16 +59,18 @@ fn main() {
 
     // ==================== EVALUATION ====================
 
-    // Predict with both models
-    let gini_pred = gini_tree.predict(&test);
+    // Model 1 predictions already computed via build_and_predict
     let entropy_pred = entropy_tree.predict(&test);
 
-    // Confusion matrices via linfa
-    let gini_cm = gini_pred.confusion_matrix(&test).expect("confusion matrix");
+    // Confusion matrices via linfa (entropy model)
     let entropy_cm = entropy_pred.confusion_matrix(&test).expect("confusion matrix");
-
-    let gini_acc = gini_cm.accuracy();
     let entropy_acc = entropy_cm.accuracy();
+
+    // Compute gini accuracy manually (gini_pred is Array1<usize> from lib.rs)
+    let actuals: Vec<usize> = test.as_targets().iter().copied().collect();
+    let gini_preds: Vec<usize> = gini_pred.iter().copied().collect();
+    let gini_correct = gini_preds.iter().zip(actuals.iter()).filter(|(p, a)| p == a).count();
+    let gini_acc = gini_correct as f64 / actuals.len() as f64;
 
     // --- Model Comparison Table ---
     let mut cmp_table = Table::new();
@@ -101,9 +100,6 @@ fn main() {
     println!("{cmp_table}\n");
 
     // --- Confusion Matrix (Gini model) ---
-    // predict() returns Array1<usize> directly
-    let gini_preds: Vec<usize> = gini_pred.iter().copied().collect();
-    let actuals: Vec<usize> = test.as_targets().iter().copied().collect();
     println!("  Confusion Matrix (Tree 1 -- Gini)");
     print_confusion_matrix(&actuals, &gini_preds);
 
