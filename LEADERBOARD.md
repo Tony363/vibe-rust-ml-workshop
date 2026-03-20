@@ -2,8 +2,12 @@
 
 Scores from the workshop challenge. CI scores every PR using a deterministic scorer (`src/bin/score.rs`) with fixed RNG seed (1) for fair comparison.
 
+*Updated automatically when submissions are merged.*
+
 | Rank | Participant | Accuracy | Model | PR |
 |------|-------------|----------|-------|----|
+| 🥇 | @Tony363 | 96.7% | DecisionTree (Gini, depth=5) | #4 |
+| 🥈 | @Tony363 | 93.3% | DecisionTree (Entropy, depth=3) | #10 |
 | -    | Baseline    | 93.3%    | DecisionTree (Entropy, depth=10) | - |
 
 ## How to Submit
