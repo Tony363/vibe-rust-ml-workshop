@@ -138,7 +138,7 @@ Say to the audience: "We have a working ML pipeline. Now let's do some real vibe
 - Add a feature importance display -- which measurements matter most for classifying irises?
 - Change the train/test ratio from 80/20 to 60/40 -- how robust is our model?
 - Add color to the terminal output using ANSI codes or the `colored` crate.
-- **Submit to the leaderboard** -- fork the repo, edit `src/lib.rs` to try a different algorithm (KNN, SVM, logistic regression), run `cargo run --bin score --release` locally, then open a PR targeting the `submissions` branch. CI will score your model and post a ranked leaderboard. See `LEADERBOARD_RULES.md` for details.
+- **Submit to the leaderboard** -- fork the repo, edit `src/lib.rs` to try a different algorithm (KNN, SVM, logistic regression), run `cargo run --bin score --release` locally, then open a PR targeting the `submissions` branch. CI will score your model and post a full performance report: accuracy chart, confusion matrix, and per-class precision/recall/F1. See `LEADERBOARD_RULES.md` for details.
 
 **How to run this segment:**
 

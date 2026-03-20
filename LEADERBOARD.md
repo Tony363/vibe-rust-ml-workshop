@@ -12,7 +12,7 @@ Scores from the workshop challenge. CI scores every PR using a deterministic sco
 2. Edit `src/lib.rs` -- change `build_and_predict()` and `model_name()` to try different algorithms
 3. Run `cargo run --bin score --release` locally to check your deterministic score
 4. Push your branch and open a PR targeting the `submissions` branch
-5. CI will automatically score your code and post a leaderboard comment on the PR
+5. CI will automatically score your code and post a detailed report on the PR (accuracy chart, confusion matrix, per-class metrics)
 
 ## Rules
 

@@ -179,7 +179,12 @@ git push -u origin my-submission
 - Only modify `src/lib.rs` and `Cargo.toml`
 - Must use linfa algorithms
 - CI scores your `build_and_predict()` function with a fixed seed for fairness
-- CI will automatically post a leaderboard ranking on your PR
+- CI will automatically post a leaderboard comment on your PR with:
+  - Accuracy comparison chart (Mermaid bar chart)
+  - Ranked standings across all submissions
+  - Confusion matrix showing per-class predictions
+  - Per-class precision, recall, and F1 scores
+- When your PR is merged, the [LEADERBOARD.md](LEADERBOARD.md) on the `submissions` branch is updated automatically
 
 See [LEADERBOARD.md](LEADERBOARD.md) for current standings.
 

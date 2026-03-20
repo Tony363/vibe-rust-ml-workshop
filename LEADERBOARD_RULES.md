@@ -39,6 +39,17 @@ Only modify these two functions in `src/lib.rs`:
 - Metric: accuracy = correct predictions / total test samples
 - Deterministic -- same code always gets the same score
 
+## What You Get on Your PR
+
+CI posts a detailed performance report as a comment on your PR:
+
+- **Accuracy comparison chart** -- Mermaid bar chart showing your score vs other submissions and the baseline
+- **Ranked leaderboard** -- standings across all open submissions
+- **Confusion matrix** -- shows which classes your model confuses
+- **Per-class metrics** -- precision, recall, and F1 score for Setosa, Versicolor, and Virginica
+
+When your PR is merged, the unified [LEADERBOARD.md](LEADERBOARD.md) on the `submissions` branch is updated automatically.
+
 ## Quick-Start Vibe Prompts
 
 Try giving these prompts to your AI coding assistant:
