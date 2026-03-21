@@ -8,11 +8,12 @@ CI scores every PR using deterministic scorers with fixed RNG seed (1) for fair 
 
 | Rank | Participant | Accuracy | Model | PR |
 |------|-------------|----------|-------|----|
-| 🥇 | @AnisahLM | 96.7% | DecisionTree (Gini, depth=8) | #16 |
-| 🥈 | @Tony363 | 96.7% | DecisionTree (Gini, unlimited depth) | #15 |
-| 🥉 | @sarahbouayad | 96.7% | Medina Creative Model (Gini, no depth limit) | #14 |
-| 4 | @Tony363 | 96.7% | DecisionTree (Gini, depth=5) | #4 |
-| 5 | @Tony363 | 93.3% | DecisionTree (Entropy, depth=3) | #10 |
+| 🥇 | @Tony363 | 96.7% | E2E Pipeline Test (Gini, depth=6) | #18 |
+| 🥈 | @AnisahLM | 96.7% | DecisionTree (Gini, depth=8) | #16 |
+| 🥉 | @Tony363 | 96.7% | DecisionTree (Gini, unlimited depth) | #15 |
+| 4 | @sarahbouayad | 96.7% | Medina Creative Model (Gini, no depth limit) | #14 |
+| 5 | @Tony363 | 96.7% | DecisionTree (Gini, depth=5) | #4 |
+| 6 | @Tony363 | 93.3% | DecisionTree (Entropy, depth=3) | #10 |
 | -    | Baseline    | 93.3%    | DecisionTree (Entropy, depth=10) | - |
 
 ## Wine Quality (Hard)
@@ -20,8 +21,9 @@ CI scores every PR using deterministic scorers with fixed RNG seed (1) for fair 
 | Rank | Participant | Accuracy | Model | PR |
 |------|-------------|----------|-------|----|
 | 🥇 | @AnisahLM | 61.8% | DecisionTree (Entropy, depth=20, normalised) | #16 |
-| 🥈 | @sarahbouayad | 54.9% | DecisionTree (Gini, depth=7) | #14 |
-| 🥉 | @Tony363 | 54.5% | DecisionTree (Gini, depth=7) | #15 |
+| 🥈 | @Tony363 | 59.6% | DecisionTree (Entropy, depth=20, normalised) | #18 |
+| 🥉 | @sarahbouayad | 54.9% | DecisionTree (Gini, depth=7) | #14 |
+| 4 | @Tony363 | 54.5% | DecisionTree (Gini, depth=7) | #15 |
 | -    | Baseline    | 53.9%    | DecisionTree (Gini, depth=5) | - |
 
 ## How to Submit
