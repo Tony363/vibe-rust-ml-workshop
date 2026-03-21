@@ -12,7 +12,7 @@ pub fn build_and_predict(
 ) -> Array1<usize> {
     let model = DecisionTree::params()
         .split_quality(SplitQuality::Gini)
-        .max_depth(Some(6))
+        .max_depth(Some(3))
         .fit(train)
         .expect("training failed");
     model.predict(test_features)
@@ -20,7 +20,7 @@ pub fn build_and_predict(
 
 /// Name your model (shown on the leaderboard)
 pub fn model_name() -> &'static str {
-    "E2E Pipeline Test (Gini, depth=6)"
+    "Fork PR Test (Gini, depth=3)"
 }
 
 // ===================== HARD MODE: Wine Quality =====================
